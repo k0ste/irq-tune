@@ -13,7 +13,8 @@
 import subprocess
 import json
 import shlex
-
+import os
+from optparse import OptionParser
 
 def get_mask(selectedcpu):
 
@@ -60,12 +61,14 @@ def write_proc(irqlist):
         irqmask = total_mask(irq['cores'], "hex")
         irqnumber = irq['irq']
         procname = "/proc/irq/%s/smp_affinity" % (irqnumber)
-        procfile = open(procname, 'w')
-        procfile.write(irqmask)
-        procfile.close()
-
-        print "Set IRQ:%s to cores: %s" % (irqnumber, ', '.join(str(x) for x in irq['cores']))
-        print "mask: %s procfile: %s" % (irqmask, procname)
+        if os.path.exists(procname):
+            procfile = open(procname, 'w')
+            procfile.write(irqmask)
+            procfile.close()
+            print "Set IRQ:%s to cores: %s" % (irqnumber, ', '.join(str(x) for x in irq['cores']))
+            print "mask: %s procfile: %s" % (irqmask, procname)
+        else:
+            print "****** ERROR ****** The irq %s, for %s  does not exists" % ( irqnumber, irq['note'] )
 
 
 def main():
@@ -74,8 +77,23 @@ def main():
     # irqlist = [ { 'irq': '259', 'cores': [32,21] },\
     #            { 'irq': '370', 'cores': [36]      } ]
 
-    json_data = open("irq.json").read()
+    parser = OptionParser(usage="%prog -j JSONFILE",version = "%prog 0.1")
+    parser.add_option("-j", "--json", dest="jsonfile",
+            help="the json configuration file", metavar="JSONFILE")
+    (options,args) = parser.parse_args()
+
+    if not options.jsonfile:
+        parser.print_help()
+        parser.error("You must specify a json file with -j or --json")
+    if not os.path.exists(options.jsonfile):
+        parser.parse_args()
+        parse.error("The file: " + options.jsonfile + "does not exist.")
+
+
+    #json_data = open("irq.json").read()
+    json_data = open(options.jsonfile).read()
     irqdict = json.loads(json_data)
+    
 
     write_proc(irqdict)
 
