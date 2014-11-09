@@ -14,7 +14,24 @@ import subprocess
 import json
 import shlex
 import os
+import csv
+import pprint
 from optparse import OptionParser
+
+
+def get_device_irq_dict():
+
+    devicemap = {}
+    for line in csv.reader(open("/proc/interrupts"), delimiter=' '):
+        devicemap[line[-1]] = line[1].translate(None,':')
+    return devicemap
+
+def reset_irq_on_device(irqdict):
+
+    devicemap = get_device_irq_dict()
+
+    for irq in irqdict: 
+        irq['irq'] = devicemap[irq['name']]
 
 def get_mask(selectedcpu):
 
@@ -80,6 +97,8 @@ def main():
     parser = OptionParser(usage="%prog -j JSONFILE",version = "%prog 0.1")
     parser.add_option("-j", "--json", dest="jsonfile",
             help="the json configuration file", metavar="JSONFILE")
+    parser.add_option("-a","--auto-irq",action="store_true", dest="auto_irq", default=False,
+            help="look up the IRQs from device names")
     (options,args) = parser.parse_args()
 
     if not options.jsonfile:
@@ -93,16 +112,18 @@ def main():
     #json_data = open("irq.json").read()
     json_data = open(options.jsonfile).read()
     irqdict = json.loads(json_data)
-    
+
+    if options.auto_irq:
+        reset_irq_on_device(irqdict)
 
     write_proc(irqdict)
-
 
 if __name__ == "__main__":
     main()
 
 # Some debugging junk
 #
+#  ddpprint.pprint(irqdict,width=120)
 #  bmask = total_mask(cpulist,"binary")
 #  hmask1 = total_mask(cpulist,"hex")
 #  hmask2 = total_mask(irqlist[0]['cores'],"hex")
