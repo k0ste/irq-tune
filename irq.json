@@ -39,8 +39,10 @@
   { "irq": "400", "cores": [5],  "slot":"4", "name":"mlx2-13" },
   { "irq": "401", "cores": [9],  "slot":"4", "name":"mlx2-14" },
   { "irq": "402", "cores": [13],  "slot":"4", "name":"mlx2-15" },
-  { "irq": "529", "cores": [35], "slot":"8", "name":"iodrive-0000:64:00.0-0" },
-  { "irq": "530", "cores": [39], "slot":"8", "name":"iodrive-0000:65:00.0-0" },
+  { "irq": "529", "cores": [35], "slot":"8", "name":"iodrive-0000:65:00.0-0" },
+  { "irq": "530", "cores": [39], "slot":"8", "name":"iodrive-0000:66:00.0-0" },
+  { "irq": "529", "cores": [43], "slot":"8", "name":"iodrive-0000:6a:00.0-0" },
+  { "irq": "530", "cores": [47], "slot":"8", "name":"iodrive-0000:6b:00.0-0" },
   { "irq": "488", "cores": [3],  "slot":"9", "name":"mlx3-0" },
   { "irq": "489", "cores": [7],  "slot":"9", "name":"mlx3-1" },
   { "irq": "490", "cores": [11],  "slot":"9", "name":"mlx3-2" },
@@ -56,7 +58,24 @@
   { "irq": "500", "cores": [3],  "slot":"9", "name":"mlx3-12" },
   { "irq": "501", "cores": [7],  "slot":"9", "name":"mlx3-13" },
   { "irq": "502", "cores": [11],  "slot":"9", "name":"mlx3-14" },
-  { "irq": "503", "cores": [15],  "slot":"9", "name":"mlx3-15" }
+  { "irq": "503", "cores": [15],  "slot":"9", "name":"mlx3-15" },
+  { "irq": "488", "cores": [3],  "slot":"9", "name":"mlxl3-0" },
+  { "irq": "489", "cores": [7],  "slot":"9", "name":"mlxl3-1" },
+  { "irq": "490", "cores": [11],  "slot":"9", "name":"mlxl3-2" },
+  { "irq": "491", "cores": [15],  "slot":"9", "name":"mlxl3-3" },
+  { "irq": "492", "cores": [19],  "slot":"9", "name":"mlxl3-4" },
+  { "irq": "493", "cores": [23],  "slot":"9", "name":"mlxl3-5" },
+  { "irq": "494", "cores": [27],  "slot":"9", "name":"mlxl3-6" },
+  { "irq": "495", "cores": [31],  "slot":"9", "name":"mlxl3-7" },
+  { "irq": "496", "cores": [35],  "slot":"9", "name":"mlxl3-8" },
+  { "irq": "497", "cores": [39],  "slot":"9", "name":"mlxl3-9" },
+  { "irq": "498", "cores": [43],  "slot":"9", "name":"mlxl3-10" },
+  { "irq": "499", "cores": [47],  "slot":"9", "name":"mlxl3-11" },
+  { "irq": "500", "cores": [3],  "slot":"9", "name":"mlxl3-12" },
+  { "irq": "501", "cores": [7],  "slot":"9", "name":"mlxl3-13" },
+  { "irq": "502", "cores": [11],  "slot":"9", "name":"mlxl3-14" },
+  { "irq": "503", "cores": [15],  "slot":"9", "name":"mlxl3-15" }
+
 
 ]
 
