@@ -85,7 +85,7 @@ def write_proc(irqlist):
             print "Set IRQ:%s to cores: %s" % (irqnumber, ', '.join(str(x) for x in irq['cores']))
             print "mask: %s procfile: %s" % (irqmask, procname)
         else:
-            print "****** ERROR ****** The irq %s, for %s  does not exists" % ( irqnumber, irq['note'] )
+            print "****** ERROR ****** The irq %s, for %s  does not exists" % ( irqnumber, irq['name'] )
 
 
 def main():
