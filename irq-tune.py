@@ -23,14 +23,19 @@ def get_device_irq_dict():
 
     devicemap = {}
     for line in csv.reader(open("/proc/interrupts"), delimiter=' '):
-        devicemap[line[-1]] = line[1].translate(None,':')
+        # IRQ number < 100, most of single CPU systems (like Xeon E3)
+        if line[1] == "":
+            devicemap[line[-1]] = line[2].translate(None,':')
+        # IRQ number > 100, more than one CPU or many queues
+        else:
+            devicemap[line[-1]] = line[1].translate(None,':')
     return devicemap
 
 def reset_irq_on_device(irqdict):
 
     devicemap = get_device_irq_dict()
 
-    for irq in irqdict: 
+    for irq in irqdict:
         irq['irq'] = devicemap[irq['name']]
 
 def get_mask(selectedcpu):
@@ -57,7 +62,7 @@ def add_commas(mask):
 
 
 def total_mask(cpulist, masktype):
-    
+
     masklist = []
     formatted_mask = ""
     for cpu in cpulist:
@@ -82,10 +87,10 @@ def write_proc(irqlist):
             procfile = open(procname, 'w')
             procfile.write(irqmask)
             procfile.close()
-            print "Set IRQ:%s to cores: %s" % (irqnumber, ', '.join(str(x) for x in irq['cores']))
+            print "Set IRQ [%s]: %s to cores: %s" % (irq['name'], irqnumber, ', '.join(str(x) for x in irq['cores']))
             print "mask: %s procfile: %s" % (irqmask, procname)
         else:
-            print "****** ERROR ****** The irq %s, for %s  does not exists" % ( irqnumber, irq['name'] )
+            print "****** ERROR ****** The irq %s, for %s does not exists" % (irqnumber, irq['name'])
 
 
 def main():
@@ -94,11 +99,11 @@ def main():
     # irqlist = [ { 'irq': '259', 'cores': [32,21] },\
     #            { 'irq': '370', 'cores': [36]      } ]
 
-    parser = OptionParser(usage="%prog -j JSONFILE",version = "%prog 0.1")
+    parser = OptionParser(usage="%prog -j JSONFILE", version="%prog 0.1")
     parser.add_option("-j", "--json", dest="jsonfile",
             help="the json configuration file", metavar="JSONFILE")
-    parser.add_option("-a","--auto-irq",action="store_true", dest="auto_irq", default=False,
-            help="look up the IRQs from device names")
+    parser.add_option("-a", "--auto-irq", action="store_true", dest="auto_irq",
+            default=False, help="look up the IRQs from device names")
     (options,args) = parser.parse_args()
 
     if not options.jsonfile:
