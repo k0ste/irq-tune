@@ -12,12 +12,9 @@
 
 import subprocess
 import json
-import shlex
-import os
+import os, sys
 import csv
-import pprint
 from optparse import OptionParser
-
 
 def get_device_irq_dict():
 
@@ -25,10 +22,18 @@ def get_device_irq_dict():
     for line in csv.reader(open("/proc/interrupts"), delimiter=' '):
         # IRQ number < 100, most of single CPU systems (like Xeon E3)
         if line[1] == "":
-            devicemap[line[-1]] = line[2].translate(None,':')
+            if sys.version_info.major < 3:
+                devicemap[line[-1]] = line[2].translate(None, ':')
+            else:
+                map = str.maketrans('', '', ':')
+                devicemap[line[-1]] = line[2].translate(map)
         # IRQ number > 100, more than one CPU or many queues
         else:
-            devicemap[line[-1]] = line[1].translate(None,':')
+            if sys.version_info.major < 3:
+                devicemap[line[-1]] = line[1].translate(None, ':')
+            else:
+                map = str.maketrans('', '', ':')
+                devicemap[line[-1]] = line[1].translate(map)
     return devicemap
 
 def reset_irq_on_device(irqdict):
@@ -48,7 +53,6 @@ def get_mask(selectedcpu):
             cpumask = "0" + cpumask
     return cpumask
 
-
 def add_commas(mask):
 
     split_mask = [mask[x:x + 8] for x in range(0, len(mask), 8)]
@@ -59,7 +63,6 @@ def add_commas(mask):
         else:
             comma_sep = comma_sep + "," + split_mask[i]
     return comma_sep
-
 
 def total_mask(cpulist, masktype):
 
@@ -82,22 +85,17 @@ def write_proc(irqlist):
     for irq in irqlist:
         irqmask = total_mask(irq['cores'], "hex")
         irqnumber = irq['irq']
-        procname = "/proc/irq/%s/smp_affinity" % (irqnumber)
+        procname = "/proc/irq/{0}/smp_affinity".format(irqnumber)
         if os.path.exists(procname):
             procfile = open(procname, 'w')
             procfile.write(irqmask)
             procfile.close()
-            print "Set IRQ [%s]: %s to cores: %s" % (irq['name'], irqnumber, ', '.join(str(x) for x in irq['cores']))
-            print "mask: %s procfile: %s" % (irqmask, procname)
+            print("Set IRQ [{0}]: {1} to cores: {2}".format(irq['name'], irqnumber, ', '.join(str(x) for x in irq['cores'])))
+            print("mask: {0} procfile: {1}".format(irqmask, procname))
         else:
-            print "****** ERROR ****** The irq %s, for %s does not exists" % (irqnumber, irq['name'])
-
+            print("****** ERROR ****** The IRQ {0}, for {1} does not exists".format(irqnumber, irq['name']))
 
 def main():
-
-    # Example irq data structure
-    # irqlist = [ { 'irq': '259', 'cores': [32,21] },\
-    #            { 'irq': '370', 'cores': [36]      } ]
 
     parser = OptionParser(usage="%prog -j JSONFILE", version="%prog 0.1")
     parser.add_option("-j", "--json", dest="jsonfile",
@@ -113,8 +111,6 @@ def main():
         parser.parse_args()
         parse.error("The file: " + options.jsonfile + "does not exist.")
 
-
-    #json_data = open("irq.json").read()
     json_data = open(options.jsonfile).read()
     irqdict = json.loads(json_data)
 
@@ -125,13 +121,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Some debugging junk
-#
-#  ddpprint.pprint(irqdict,width=120)
-#  bmask = total_mask(cpulist,"binary")
-#  hmask1 = total_mask(cpulist,"hex")
-#  hmask2 = total_mask(irqlist[0]['cores'],"hex")
-#  hreal = total_mask([36],"hex")
-#  print hmask2
-#  print hreal
